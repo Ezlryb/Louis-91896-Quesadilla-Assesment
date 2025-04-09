@@ -46,7 +46,8 @@ def name_case(message):
         new_name = []
         cap = True
         if name == "":
-            input("Please enter a valid name!\n\nPress enter to continue\n\n> ")
+            os.system('clear')
+            print("Please enter a valid name!")
             continue
         for letter in name:
             if letter.lower() in "abcdefghijklmnopqrstuvwxyz":
