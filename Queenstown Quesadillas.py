@@ -280,5 +280,6 @@ def main():
                 order.sort()
             input(f"{cart()}\n\n Press enter to return to menu\n\n> ")
 
+if __name__ == "__main__":
+    main()
 
-main()
