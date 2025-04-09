@@ -1,6 +1,8 @@
 """Queenstown Quesadillas is a program to automate the odering prcess for a quasadillas resturaunt in queenstown"""
 import os, math
 
+
+
 yes_inputs = ["yes", "y"]
 no_inputs = ["no", "n"]
 date = [8, 4, 2025] #day, month, year
@@ -9,14 +11,14 @@ months_2d = [
     ["2", "02", "feb", "february"],
     ["3", "03", "mar", "march"],
     ["4", "04", "apr", "april"],
-    ["5", "05", "may"],
+    ["5", "05", "may", "may"],
     ["6", "06", "jun", "june"],
     ["7", "07", "jul", "july"],
     ["8", "08", "aug", "august"],
-    ["9", "09", "sep", "sept", "september"],
-    ["10", "oct", "october"],
-    ["11", "nov", "november"],
-    ["12", "dec", "december"]
+    ["9", "09", "sept", "september"],
+    ["10", "10", "oct", "october"],
+    ["11", "11", "nov", "november"],
+    ["12", "12", "dec", "december"]
 ]
 month_lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 quesadilla_menu = [
@@ -33,6 +35,39 @@ quesadilla_menu = [
     ["Jalapeños", 0.75, "Spice things up with sliced jalapeños, perfect for an extra kick."]
 ]
 order = []
+
+def name_case(message):
+    """Asks for name with message and returns the name with capitals and spaces if its has no symbols or numbers"""
+    while True:
+        os.system('clear')
+        error = False
+        name = input(message)
+        new_name = []
+        cap = True
+        if name == "":
+            input("Please enter a valid name!\n\nPress enter to continue\n\n> ")
+            continue
+        for letter in name:
+            if letter.lower() in "abcdefghijklmnopqrstuvwxyz":
+                if cap:
+                    new_name.append(letter.upper())
+                    cap = False
+                else:
+                    new_name.append(letter.lower())            
+            else:
+                if letter == " ":
+                    new_name.append(letter)
+                    cap = True
+                else:
+                    input("Please do not enter any symbols or numbers!\n\nPress enter to continue\n\n> ")
+                    error = True
+                    break
+        if not error:
+            name = ""
+            for letter in new_name:
+                name += letter
+            return name
+
 
 
 def get_int(question, lower, upper):
@@ -75,8 +110,8 @@ def card_num():
     """Returns card number as int"""
     while True:
         number = get_int("Please enter your card number", 0, 999999999999999)
-        if str(number).len() <= 9:
-            print("Please enter a valid card number of at least nine digits.")
+        if len(str(number)) <= 8:
+            input("Please enter a valid card number of at least nine digits!\n\nPress enter to continue\n\n> ")
         else:
             return number
 
@@ -89,7 +124,13 @@ def year():
 def month():
     """Returns card's expiration month in 1, 2 ect. format as int"""
     while True:
-        month = input("What mouth does it expire in?")
+        message = "Eg. ("
+        for month_name in months_2d:
+            message += month_name[2] + ", "
+        message = message[:-2] + ")"
+
+
+        month = input(f"What month does it expire in?\n{message}\n\n> ")
         for i in range(12):
             if month in months_2d[i]:
                 print(i)
@@ -98,23 +139,23 @@ def month():
         print("Please enter a valid month!\n\n")
 
 
-def day():
+def day(month, year):
+    if month  == 4 and year/4 == int(year/4):
+            get_int("What day of the month will it expire", 1, 29) 
+    else:
+        get_int("What day of the month will it expire", 1, month_lengths[month]) 
+    
 
-    get_int("What day of the mouth is it in") 
 
 
 def checkout():
-    card_num()
-    temp_month = month()
-    if date[0] >= temp_month():
-        print()
-    
-
-
-
-    
-    
-
+    card_name = name_case("Please enter the name on the card\n> ")
+    num = card_num()
+    expiry_year = year()
+    expiry_month = month()
+    expiry_day = day(expiry_month, expiry_year)
+    if date[1] >= expiry_month:
+        input("You have ")  
 
 
 
@@ -148,12 +189,12 @@ def cart():
 def main():
     """While loop with all the user's options"""
     while True:
-        choice = get_int(menu() + "\nWhat would you like to add to your order? (Enter 0 to go to cart!)", 0, 11) - 1 # choice equals the users chosen item's index in the quesadilla_menu list
+        choice = get_int(menu() + "\n\nWhat would you like to add to your order? (Enter 0 to go to cart!)", 0, 11) - 1 # choice equals the users chosen item's index in the quesadilla_menu list
         os.system('clear')
         if choice == -1:
             if len(order) != 0:
                 print(cart())
-                choice = get_int("Press (1) to check out\nPress (2) to remove items/extras from your order\nPress (3) to return to menu.", 1, 3)
+                choice = get_int(f"{cart()}\n\nPress (1) to check out\nPress (2) to remove items/extras from your order\nPress (3) to return to menu.", 1, 3)
                 if choice == 1:
                     checkout()
                 elif choice == 2:
