@@ -36,6 +36,8 @@ quesadilla_menu = [
 order = []
 
 
+
+
 def name_case(message):
     """Asks for name with message and returns the name with capitals and spaces if its has no symbols or numbers"""
     os.system('clear')
@@ -198,24 +200,27 @@ def checkout():
     total = 0
     for item in order:
         total += item[1]
-    answer = get_int(f"Would you prefer:\n\n(1) Pickup ${total} \n\n(2) Delivered ${total + 10} ", 1, 2)
+    answer = get_int(f"Please choose one:\n\n(1) Pickup ${total} \n(2) Delivered ${total + 10}\n(3) Cancel order", 1, 3)
     if answer == 1:
         print(f"Your order will be ready in roughly {len(order)} minutes!")
-    else:
-        adress = input("Please enter your full adress (please note if you live outside the queenstown basin we will not be able to deliver your order)").lower()
+    elif answer == 2:
+        adress = input("Please enter your full adress (please note if you live outside Queenstown Basin we will not be able to deliver your order)\n\n> ")
         os.system('clear')
-        answer = input(f"Is this adress correct? (y/n) \n\n{adress}")
+        answer = input(f"Is this adress correct? (y/n) \n\n{adress}\n\n> ")
         os.system('clear')
         if answer in no_inputs:
             print("Thats a shame :(")
-        print("Your order is on its way!")
+        print("Your order is on its way!\n")
+    else:
+        return
 
 
 
 def menu():
     """Returns the menu as a string"""
     os.system('clear')
-    message = "\n     **** Queenstown Quesadillas ****\n\n"
+    message = "\n     **** Queenstown Quesadillas ****\nCall us at 027-000-000-0000\n\n"
+
     for i, thing in enumerate(quesadilla_menu):
         if i == menu_length:
             message += ("\n\n    **** Extas Menu ****\n\n")
