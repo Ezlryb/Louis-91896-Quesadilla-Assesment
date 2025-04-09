@@ -1,11 +1,9 @@
-"""Queenstown Quesadillas is a program to automate the odering prcess for a quasadillas resturaunt in queenstown"""
+"""Queenstown Quesadillas is a program to automate the ordering prcess for a quasadillas resturaunt in queenstown"""
 import os, math
-
-
 
 yes_inputs = ["yes", "y"]
 no_inputs = ["no", "n"]
-date = [8, 4, 2025] #day, month, year
+date = [4, 2025] #day, month, year
 months_2d = [
     ["1", "01", "jan", "january"],
     ["2", "02", "feb", "february"],
@@ -21,6 +19,7 @@ months_2d = [
     ["12", "12", "dec", "december"]
 ]
 month_lengths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+menu_length = 8 # increase by one for every quesadilla added or decrease if one is removed (this variable indicates where the extras menu has started)
 quesadilla_menu = [
     ["Classic Quesadilla", 7.99, "A crispy, golden tortilla stuffed with a blend of melted cheddar and Monterey Jack cheese. Served with sour cream and salsa."],
     ["Chicken Quesadilla", 9.99, "Grilled chicken, melted cheese, and sautéed peppers, folded into a warm tortilla. Served with sour cream and salsa."],
@@ -33,13 +32,14 @@ quesadilla_menu = [
     ["Extra Cheese", 1.00, "Add an extra layer of gooey, melted cheese to any quesadilla."],
     ["Guacamole", 1.50, "A side of fresh, creamy guacamole for dipping or topping."],
     ["Jalapeños", 0.75, "Spice things up with sliced jalapeños, perfect for an extra kick."]
-]
+] # name, price, discriptioin
 order = []
+
 
 def name_case(message):
     """Asks for name with message and returns the name with capitals and spaces if its has no symbols or numbers"""
+    os.system('clear')
     while True:
-        os.system('clear')
         error = False
         name = input(message)
         new_name = []
@@ -59,7 +59,8 @@ def name_case(message):
                     new_name.append(letter)
                     cap = True
                 else:
-                    input("Please do not enter any symbols or numbers!\n\nPress enter to continue\n\n> ")
+                    os.system('clear')
+                    print("Please do not enter any symbols or numbers!")
                     error = True
                     break
         if not error:
@@ -77,7 +78,7 @@ def get_int(question, lower, upper):
         num = input(question + "\n> ")
         os.system('clear')
         try:
-            if int(num) >= lower and int(num) <= upper and str(int(num)) == num:
+            if int(num) >= lower and int(num) <= upper and num.find(".") == -1:
                 return int(num)
             else:
                 int("")
@@ -99,26 +100,37 @@ def get_int(question, lower, upper):
 def get_expected_input(question, possible_inputs):
     """inputs question and a lsit of valid inputs and loops until the users answer is one of the possible inputs then returns that as a string"""
     while True:
-        answer = input(question)
+        answer = input(question).lower()
         if answer in possible_inputs:
             return answer
         else:
             input("Invalid input, press enter to continue\n\n> ")
 
 
+
 def card_num():
     """Returns card number as int"""
+    os.system('clear')
     while True:
-        number = get_int("Please enter your card number", 0, 999999999999999)
+        number = input("Please enter your card number\n> ")
+        try:
+            int(number)
+        except ValueError:
+            os.system('clear')
+            print("Please enter a number!")
+            continue
         if len(str(number)) <= 8:
-            input("Please enter a valid card number of at least nine digits!\n\nPress enter to continue\n\n> ")
+            os.system('clear')
+            print("Please enter a valid card number of at least nine digits!")
         else:
             return number
+
 
 
 def year():
     """Returns card's expiration year as int"""
     return get_int("What year does your card expire?", 1950, 2050)
+
 
 
 def month():
@@ -130,34 +142,73 @@ def month():
         message = message[:-2] + ")"
 
 
-        month = input(f"What month does it expire in?\n{message}\n\n> ")
+        month = input(f"What month does it expire in?\n{message}\n\n> ").lower()
         for i in range(12):
             if month in months_2d[i]:
-                print(i)
                 return i
         os.system('clear')
         print("Please enter a valid month!\n\n")
 
 
-def day(month, year):
-    if month  == 4 and year/4 == int(year/4):
-            get_int("What day of the month will it expire", 1, 29) 
-    else:
-        get_int("What day of the month will it expire", 1, month_lengths[month]) 
-    
+
+def security_code():
+    os.system('clear')
+    while True:
+        security_code = input("Please enter your security code\n> ")
+        try:
+            int(security_code)
+            if len(str(security_code)) == 3:
+                return security_code
+        except ValueError:
+            pass
+        os.system('clear')
+        print("Please enter a valid three-digit code!")
 
 
 
 def checkout():
-    card_name = name_case("Please enter the name on the card\n> ")
-    num = card_num()
-    expiry_year = year()
-    expiry_month = month()
-    expiry_day = day(expiry_month, expiry_year)
-    if date[1] >= expiry_month:
-        input("You have ")  
-
-
+    """Prints checkout menu and gets the users information"""
+    boolean = True
+    while boolean:
+        card_name = name_case("Please enter the card holders name\n> ").strip()
+        num = card_num().strip()
+        code = security_code().strip()
+        expiry_year = year()
+        expiry_month = month()
+        os.system('clear')
+        if date[1] == expiry_year:
+            if date[0] <= expiry_month:
+                input("This card has expired!\n\nPress enter to continue\n\n> ")
+                continue
+        elif date[1] > expiry_year:
+            input("This card has expired!\n\nPress enter to continue\n\n> ")
+            continue
+        while True:
+            answer = input(f"Is this information correct? (y/n)\n\n{card_name}\n{num}  {code}\n{months_2d[expiry_month][1]}/{expiry_year}\n\n> ").lower()
+            if answer in yes_inputs:
+                boolean = False
+                break
+            if answer in no_inputs:
+                boolean = True
+                break
+            else:
+                os.system('clear')
+                print("Please enter a valid input!")
+            
+    total = 0
+    for item in order:
+        total += item[1]
+    answer = get_int(f"Would you prefer:\n\n(1) Pickup ${total} \n\n(2) Delivered ${total + 10} ", 1, 2)
+    if answer == 1:
+        print(f"Your order will be ready in roughly {len(order)} minutes!")
+    else:
+        adress = input("Please enter your full adress (please note if you live outside the queenstown basin we will not be able to deliver your order)").lower()
+        os.system('clear')
+        answer = input(f"Is this adress correct? (y/n) \n\n{adress}")
+        os.system('clear')
+        if answer in no_inputs:
+            print("Thats a shame :(")
+        print("Your order is on its way!")
 
 
 
@@ -166,7 +217,7 @@ def menu():
     os.system('clear')
     message = "\n     **** Queenstown Quesadillas ****\n\n"
     for i, thing in enumerate(quesadilla_menu):
-        if i == 8:
+        if i == menu_length:
             message += ("\n\n    **** Extas Menu ****\n\n")
         message += (f"\n({i+1}) {thing[0]}  ${thing[1]}\n {thing[2]}\n") # eg (1) Classic Quesadilla
 
@@ -188,42 +239,57 @@ def cart():
 
 def main():
     """While loop with all the user's options"""
+    global order 
     while True:
-        choice = get_int(menu() + "\n\nWhat would you like to add to your order? (Enter 0 to go to cart!)", 0, 11) - 1 # choice equals the users chosen item's index in the quesadilla_menu list
+        menu_choice = get_int(menu() + "\n\nWhat would you like to add to your order? (Enter 0 to go to cart!)", 0, len(quesadilla_menu)) - 1 # choice equals the users chosen item's index in the quesadilla_menu list
         os.system('clear')
-        if choice == -1:
+        if menu_choice == -1:
             if len(order) != 0:
-                print(cart())
-                choice = get_int(f"{cart()}\n\nPress (1) to check out\nPress (2) to remove items/extras from your order\nPress (3) to return to menu.", 1, 3)
-                if choice == 1:
-                    checkout()
-                elif choice == 2:
-                    pass
-                elif choice == 3:
-                    continue
+                while True:
+                    print(cart())
+                    cart_choice = get_int(f"{cart()}\n\nCheck out (1)\nRemove items (2)\nReturn to menu (3)", 1, 3)
+                    if cart_choice == 1:
+                        checkout()
+                        input("Press enter to place anouther order!")
+                        order = []
+                    elif cart_choice == 2:
+                        remove_choice = get_int(f"{cart()}\n\nWhich item would you like to remove?", 1, len(order))
+                        del order[remove_choice-1]                        
+                    elif cart_choice == 3:
+                        break
 
             else:
                 input("You have no items in your cart!\nPress Enter to Continue\n\n> ")
                 continue
 
-        elif choice <= 7:
-            num_of_quesadillas = get_int(f"How many {quesadilla_menu[choice][0]}s would you like?", 0, 10)
-            if input(f"Add {num_of_quesadillas} {quesadilla_menu[choice][0]}(s) ${quesadilla_menu[choice][1]*num_of_quesadillas} to cart? (y/n)").lower().strip() in yes_inputs:
-                for i in range(num_of_quesadillas):
-                    order.append(quesadilla_menu[choice].copy())
-                order.sort()
-        elif choice >= 8:
+        elif menu_choice <= menu_length-1:
+            num_of_quesadillas = get_int(f"How many {quesadilla_menu[menu_choice][0]}s would you like?", 0, math.inf)
+            os.system('clear')
+            while True:
+                answer = input(f"Add {num_of_quesadillas} {quesadilla_menu[menu_choice][0]}(s) ${quesadilla_menu[menu_choice][1]*num_of_quesadillas} to cart? (y/n)\n\n> ").lower().strip()
+                if answer in yes_inputs:
+                    for i in range(num_of_quesadillas):
+                        order.append(quesadilla_menu[menu_choice].copy())
+                    order.sort()
+                    break
+                elif answer in no_inputs:
+                    break
+                else:
+                    os.system('clear')
+                    print("Please enter a valid input!")
+
+        elif menu_choice >= menu_length:
             if len(order) != 0:
-                item_index = get_int(f"\nWhich item would you like to add {quesadilla_menu[choice][0]} to?\n\n{cart()} ", 1, len(order))-1
+                item_index = get_int(f"\nWhich item would you like to add {quesadilla_menu[menu_choice][0]} to?\n\n{cart()} ", 1, len(order))-1
             else:
-                input(f"You have no items to add {quesadilla_menu[choice][0].lower()} to in your cart!\n\nPress Enter to Continue\n\n> ")
+                input(f"You have no items to add {quesadilla_menu[menu_choice][0].lower()} to in your cart!\n\nPress Enter to Continue\n\n> ")
                 continue
 
-            if quesadilla_menu[choice][0] in order[item_index][0]:
-                input(f"You have already added {quesadilla_menu[choice][0]} to this item\n\nPress Enter to continue\n\n> ")
+            if quesadilla_menu[menu_choice][0] in order[item_index][0]:
+                input(f"You have already added {quesadilla_menu[menu_choice][0]} to this item\n\nPress Enter to continue\n\n> ")
             else:
-                order[item_index][0] += " + " + quesadilla_menu[choice][0]
-                order[item_index][1] += quesadilla_menu[choice][1]
+                order[item_index][0] += " + " + quesadilla_menu[menu_choice][0]
+                order[item_index][1] += quesadilla_menu[menu_choice][1]
                 order.sort()
             input(f"{cart()}\n\n Press enter to return to menu\n\n> ")
 
